@@ -10,4 +10,18 @@ class Payment extends Model
 {
     use HasFactory;
     use SoftDeletes;
+
+    protected $fillable = [
+        'order_id',
+        'payment_no',
+        'payment_type',
+        'rek_num',
+        'ewallet_num',
+        'amount'
+    ];
+
+    // Relasi Invers ke Model Order
+    public function order() {
+        return $this->belongsTo(Order::class, 'order_id', 'id');
+    }
 }

@@ -10,4 +10,19 @@ class ProductGallery extends Model
 {
     use HasFactory;
     use SoftDeletes;
+
+    protected $fillable = [
+        'product_id',
+        'image',
+        'is_default'
+    ];
+
+    protected $hidden = [
+        'product_id'
+    ];
+
+    // Relasi Invers ke Model Product
+    public function product() {
+        return $this->belongsTo(Product::class, 'product_id', 'id');
+    }
 }

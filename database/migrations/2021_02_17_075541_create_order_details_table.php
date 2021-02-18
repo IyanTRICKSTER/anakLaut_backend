@@ -17,7 +17,6 @@ class CreateOrderDetailsTable extends Migration
             $table->id();
             $table->foreignId('order_id');
             $table->foreignId('product_id');
-            $table->foreignId('customer_id');
             $table->softDeletes();
             $table->timestamps();
         });

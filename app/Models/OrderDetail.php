@@ -10,4 +10,19 @@ class OrderDetail extends Model
 {
     use HasFactory;
     use SoftDeletes;
+
+    protected $fillable = [
+        'order_id',
+        'product_id'
+    ];
+
+    // Relasi Invers ke Model Order
+    public function order() {
+        return $this->belongsTo(Order::class, 'order_id', 'id');
+    }
+
+    // Relasi Invers ke Model Product
+    public function product() {
+        return $this->belongsTo(Product::class, 'product_id', 'id');
+    }
 }

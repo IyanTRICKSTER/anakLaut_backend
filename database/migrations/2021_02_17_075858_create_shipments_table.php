@@ -17,7 +17,7 @@ class CreateShipmentsTable extends Migration
             $table->id();
             $table->foreignId('order_id');
             $table->longText('shipment_address');
-            $table->string('date');
+            $table->string('shipment_date')->nullable();
             $table->string('note');
             $table->string('shipment_contact');
             $table->timestamps();

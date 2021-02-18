@@ -23,6 +23,10 @@ class Admin extends Authenticatable
         'name',
         'email',
         'password',
+        'address',
+        'rek_num',
+        'ewallet_num'
+
     ];
 
     /**
@@ -47,5 +51,17 @@ class Admin extends Authenticatable
     public function sendPasswordResetNotification($token)
     {
         $this->notify(new AdminResetPasswordNotification($token));
+    }
+
+    // Relasi ke Model Produk & Model Produk Gallery
+    public function product_galleries() {
+        return $this->hasManyThrough(
+            ProductGallery::class, 
+            Product::class, 
+            'owned_by', 
+            'product_id', 
+            'id', 
+            'id'
+        );
     }
 }

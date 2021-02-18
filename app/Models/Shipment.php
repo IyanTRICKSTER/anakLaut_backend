@@ -10,4 +10,17 @@ class Shipment extends Model
 {
     use HasFactory;
     use SoftDeletes;
+
+    protected $fillable = [
+        'order_id',
+        'shipment_address',
+        'shipment_date',
+        'note',
+        'shipment_contact'
+    ];
+
+    // Relasi Invers ke Model Order
+    public function order() {
+        return $this->belongsTo(Order::class, 'order_id', 'id');
+    }
 }

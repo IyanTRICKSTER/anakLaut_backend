@@ -32,6 +32,9 @@ Route::group(['prefix' => 'admin'], function(){
     Route::get('/password/reset', [App\Http\Controllers\AuthAdmin\ForgotPasswordController::class, 'showPasswordResetForm'])->name('admin.password.request');
     Route::get('/password/reset/{token}', [App\Http\Controllers\AuthAdmin\ResetPasswordController::class, 'showResetForm'])->name('admin.password.reset');
     Route::post('/password/reset', [App\Http\Controllers\AuthAdmin\ResetPasswordController::class, 'reset'])->name('admin.password.update');
+    Route::get('/register', [App\Http\Controllers\AuthAdmin\RegisterController::class, 'showRegistrationForm'])->name('admin.register');
+    Route::post('/register', [App\Http\Controllers\AuthAdmin\RegisterController::class, 'register']);
+
 });
 
 
