@@ -2,7 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Product;
+use App\Models\ProductGallery;
+
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\ProductRequest;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Str;
 
 class ProductController extends Controller
 {
@@ -11,9 +18,22 @@ class ProductController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
+    protected $owner_id = null;
+
+    public function __construct()
+    {
+        $this->middleware('auth:admin');
+       
+    }
+
     public function index()
     {
-        //
+         // Get current Admin Id 
+        $owner_id = Auth::guard('admin')->user()->id;
+        $products = Product::with(['owner','product_galleries'])->where('owned_by', $owner_id)->get();
+        // dd($products->count());
+        return view('pages.admin.products.index', compact('products'));
     }
 
     /**
@@ -23,7 +43,8 @@ class ProductController extends Controller
      */
     public function create()
     {
-        //
+        $productTypes = array('ikan','kepiting','cumi','kerang');
+        return view('pages.admin.products.create', compact('productTypes'));
     }
 
     /**
@@ -34,7 +55,35 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        //
+
+        $validated = $this->validate($request, [
+            'name' => ['required','max:100'],
+            'type' => ['required','max:50'],
+            'weight' => ['required','max:100','min:1'],
+            'description' => ['required'],
+            'price' => ['required','max:255'],
+            'grosir_price' => ['required','max:255'],
+            'grosir_min' => ['required','max:255'],
+            'stock' => ['required'],
+            'photo' =>  ['required', 'image']
+        ]);
+
+        $owner_id = Auth::guard('admin')->user()->id;
+
+        $validated['slug'] = Str::slug($request->name);
+        $validated['owned_by'] = $owner_id;
+
+        // Store Product
+        $newProduct = Product::create($validated);
+        
+        // Store Product Image
+        $productImage['product_id'] = $newProduct->id;
+        $productImage['image'] = $request->file('photo')->store('assets/products', 'public');
+        $productImage['is_default'] = 1;
+
+        ProductGallery::create($productImage);
+        return redirect('/admin/products');
+
     }
 
     /**
@@ -44,8 +93,10 @@ class ProductController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function show($id)
-    {
-        //
+    {   
+        $products = Product::with(['product_galleries'])->findOrFail($id);
+        // dd(gettype($products));
+        return view('pages.admin.products.detail', compact('products'));
     }
 
     /**
@@ -56,7 +107,9 @@ class ProductController extends Controller
      */
     public function edit($id)
     {
-        //
+        $product = Product::findOrFail(Crypt::decrypt($id));
+        $productTypes = array('ikan','kepiting','cumi','kerang');
+        return view('pages.admin.products.edit', compact(['product','productTypes']));
     }
 
     /**
@@ -68,7 +121,19 @@ class ProductController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $validated = $this->validate($request, [
+            'name' => ['required','max:100'],
+            'type' => ['required','max:50'],
+            'weight' => ['required','max:100','min:1'],
+            'description' => ['required'],
+            'price' => ['required','max:255'],
+            'grosir_price' => ['required','max:255'],
+            'grosir_min' => ['required','max:255'],
+            'stock' => ['required'],
+            'photo' =>  ['required', 'image']
+        ]);
+
+        dd($validated);
     }
 
     /**
@@ -79,6 +144,8 @@ class ProductController extends Controller
      */
     public function destroy($id)
     {
-        //
+        Product::destroy($id);
+        ProductGallery::where('product_id', $id)->delete();
+        return redirect()->back();
     }
 }

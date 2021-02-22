@@ -14,6 +14,6 @@ class AdminController extends Controller
     }
 
     public function dashboard() {
-        return view('authAdmin.dashboard');
+        return view('pages.dashboard');
     }
 }

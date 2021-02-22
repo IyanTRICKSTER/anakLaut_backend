@@ -28,9 +28,13 @@ class Product extends Model
         'owned_by'
     ];
 
+    public function owner() {
+        return $this->belongsTo(Admin::class, 'owned_by', 'id');
+    }
+
     // Relasi ke Model Produk Galleri
     public function product_galleries() {
-        return $this->hasMany(ProductGallery::class, 'product_id');
+        return $this->hasMany(ProductGallery::class, 'product_id', 'id');
     }
 
     // Relasi ke Model Order Detail

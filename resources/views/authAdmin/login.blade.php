@@ -1,4 +1,4 @@
-@extends('layouts.authAdmin')
+@extends('layouts.authAdminBase')
 
 @section('content')
 <!-- Outer Row -->
@@ -6,38 +6,33 @@
 
     <div class="col-xl-10 col-lg-12 col-md-9">
 
-        <div class="card o-hidden border-0 shadow-lg my-5">
+        <div class="card o-hidden border-0 shadow-lg my-5" style="border-radius: 2px">
             <div class="card-body p-0">
                 <!-- Nested Row within Card Body -->
                 <div class="row">
-                    <div class="col-lg-6 d-none d-lg-block bg-login-image"></div>
-                    <div class="col-lg-6">
+                    <div class="col-lg-7 d-none d-lg-block bg-login-image"></div>
+                    <div class="col-lg-5">
                         <div class="p-5">
                             <div class="text-center">
-                                <h1 class="h4 text-gray-900 mb-4">Welcome Back!</h1>
+                                <h1 class="h4 text-gray-900 mb-4">Selamat Datang!</h1>
                             </div>
                             <form class="user" method="POST" action="{{ route('admin.login.submit') }}">
                                 @csrf
+
                                 <div class="form-group">
                                     <input type="email"
-                                        class="form-control form-control-user @error('email') is-invalid @enderror"
+                                        class="form-control form-control-user @error('invalid') is-invalid @enderror"
                                         id="exampleInputEmail" aria-describedby="emailHelp"
                                         placeholder="Enter Email Address..." id="email" name="email"
                                         value="{{ old('email')}}">
-
-                                    @error('email')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                    @enderror
-
                                 </div>
 
                                 <div class="form-group">
-                                    <input type="password" class="form-control form-control-user @error('password') is-invalid @enderror"
+                                    <input type="password"
+                                        class="form-control form-control-user @error('invalid') is-invalid @enderror"
                                         id="exampleInputPassword" placeholder="Password" id="password" name="password">
 
-                                    @error('password')
+                                    @error('invalid')
                                     <span class="invalid-feedback" role="alert">
                                         <strong>{{ $message }}</strong>
                                     </span>
@@ -46,8 +41,9 @@
 
                                 <div class="form-group">
                                     <div class="custom-control custom-checkbox small">
-                                        <input type="checkbox" class="custom-control-input" {{ old('remember') ? 'checked' : '' }} id="customCheck">
-                                        <label class="custom-control-label" for="customCheck">Remember
+                                        <input type="checkbox" name="remember" class="custom-control-input"
+                                            {{ old('remember') ? 'checked' : '' }} id="remember">
+                                        <label class="custom-control-label" for="remember">Remember
                                             Me</label>
                                     </div>
                                 </div>
@@ -63,13 +59,13 @@
                                 </a>
                             </form>
                             <hr>
-                            @if (Route::has('admin.password.request'))   
-                                <div class="text-center">
-                                    <a class="small" href="{{ route('admin.password.request') }}">Forgot Password?</a>
-                                </div>
+                            @if (Route::has('admin.password.request'))
+                            <div class="text-center">
+                                <a class="small" href="{{ route('admin.password.request') }}">Lupa Password?</a>
+                            </div>
                             @endif
                             <div class="text-center">
-                                <a class="small" href="{{ route('admin.register') }}">Create an Account!</a>
+                                <a class="small" href="{{ route('admin.register') }}">Buat Akun!</a>
                             </div>
                         </div>
                     </div>

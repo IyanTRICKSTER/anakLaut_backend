@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Illuminate\Foundation\Auth\ResetsPasswords;
+use Illuminate\Support\Facades\Crypt;
+use Throwable;
 
 class ResetPasswordController extends Controller
 {
@@ -44,8 +46,14 @@ class ResetPasswordController extends Controller
 
         $token = $request->route()->parameter('token');
         
+        try {
+            $email = Crypt::decrypt($request->email);
+        } catch (Throwable $e) {
+            abort(404);
+        }
+
         return view('authAdmin.password.reset')->with(
-            ['token' => $token, 'email' => $request->email]
+            ['token' => $token, 'email' => $email]
         );
     }
 }

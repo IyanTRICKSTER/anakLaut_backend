@@ -62,6 +62,7 @@
 
     {{-- Scripts --}}
     @include('includes.scripts')
+    @stack('after-script')
 
 </body>
 </html>

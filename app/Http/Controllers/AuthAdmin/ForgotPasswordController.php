@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\AuthAdmin;
 
 use App\Http\Controllers\Controller;
+use App\Notifications\AdminResetPasswordNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 class ForgotPasswordController extends Controller
 {
@@ -42,7 +44,7 @@ class ForgotPasswordController extends Controller
 
         // Cek apakah email exist di databese dengan broker admins
         $status = Password::broker($request->input('broker'))->sendResetLink($request->only('email'));
-    
+
         return $status === Password::RESET_LINK_SENT
             ? back()->with(['status' => __($status)])
             : back()->withErrors(['email' => __($status)]);

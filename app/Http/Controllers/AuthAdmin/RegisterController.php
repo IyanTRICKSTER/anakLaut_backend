@@ -7,8 +7,10 @@ use App\Providers\RouteServiceProvider;
 use App\Models\Admin;
 use Illuminate\Foundation\Auth\RegistersUsers;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Auth\Events\Registered;
 
 class RegisterController extends Controller
 {
@@ -45,33 +47,40 @@ class RegisterController extends Controller
 
     public function register(Request $request)
     {
-        $validated = $request->validate([
+        $data = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:admins',
             'password' => 'required|string|min:8|confirmed',
         ]);
 
-        // dd($validated);
-        $this->create($validated);
-        return redirect()->route('admin.dashboard');
-    }
-
-    protected function validator(array $data)
-    {
-        return Validator::make($data, [
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        $user = $this->create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => Hash::make($data['password']),
         ]);
+        event(new Registered($user));
+
+        Auth::guard('admin')->login($user);
+
+        return $this->registered($request, $user)
+            ?: redirect($this->redirectPath());
+        
+        // return redirect()->route('admin.dashboard');
+        
     }
 
     protected function create(array $data)
     {
-        Admin::create([
+        return Admin::create([
             'name' => $data['name'],
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
         ]);
         
+    }
+
+    protected function registered(Request $request, $user)
+    {
+        return Auth::loginUsingId($user->id);
     }
 }

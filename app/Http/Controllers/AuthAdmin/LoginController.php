@@ -6,9 +6,12 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Foundation\Auth\AuthenticatesUsers;
 
 class LoginController extends Controller
 {
+    use AuthenticatesUsers;
+
     /*
     |--------------------------------------------------------------------------
     | Login Controller
@@ -32,6 +35,7 @@ class LoginController extends Controller
     // Login Method
     public function login(Request $request)
     {
+
         // Memvalidasi Input Login
         $validator = Validator::make($request->all(), [
             'email' => 'required|email',
@@ -44,19 +48,21 @@ class LoginController extends Controller
                 ->withErrors($validator)
                 ->withInput();
         }
-        // dd($validator);
 
         $credential = [
             'email' => $request->email,
             'password' => $request->password,
         ];
 
-        // Login Attemt
-        if (Auth::guard('admin')->attempt($credential, $remember=true)) {
-            return redirect()->intended(route('admin.dashboard'));
+        $rememberMe = !empty($request->remember) ? TRUE : FALSE;
+
+        // Login Attempt
+        if (Auth::guard('admin')->attempt($credential, $rememberMe)) {
+            return redirect()->route('admin.dashboard');
         }
 
-        return redirect()->back()->withInput($request->only('email', 'remember'))->with('email', 'invalid credential');
+        return redirect()->back()->withInput($request->only('email', 'remember'))->withErrors(array('invalid' => 'Invalid credentials'));
+        // return "incorect password";
     }
 
     // Admin Logout Method

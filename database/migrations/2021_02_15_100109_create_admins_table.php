@@ -22,6 +22,8 @@ class CreateAdminsTable extends Migration
             $table->string('address')->nullable();
             $table->integer('rek_num')->nullable();
             $table->string('ewallet_num')->nullable();
+            $table->longText('shop_description')->nullable();
+            $table->string('profil_pic')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
