@@ -1,7 +1,5 @@
 @extends('layouts.authAdminBase')
 
-
-
 @section('content')
 <div class="row justify-content-center">
     <div class="col-6">
@@ -36,7 +34,7 @@
                                     <div class="col-6">
                                         <input id="password" type="password"
                                             class="form-control form-control-user @error('password') is-invalid @enderror" name="password" required
-                                            autocomplete="new-password">
+                                            autocomplete="new-password" placeholder="new password">
                                     </div>
                                     @error('password')
                                     <span class="invalid-feedback" role="alert">
@@ -46,7 +44,7 @@
                                     {{-- Repeat Password --}}
                                     <div class="col-6">
                                         <input id="password-confirm" type="password" class="form-control form-control-user"
-                                            name="password_confirmation" required autocomplete="new-password">
+                                            name="password_confirmation" required autocomplete="new-password" placeholder="confirm password">
                                     </div>
                                 </div>
                                 <button type="submit" class="btn btn-primary btn-user btn-block">

@@ -11,17 +11,18 @@ class Payment extends Model
     use HasFactory;
     use SoftDeletes;
 
+    protected $keyType = "string";
+
     protected $fillable = [
-        'order_id',
-        'payment_no',
+        'transaction_id',
         'payment_type',
-        'rek_num',
-        'ewallet_num',
-        'amount'
+        'bank',
+        'va_number',
+        'gross_amount',
     ];
 
-    // Relasi Invers ke Model Order
-    public function order() {
-        return $this->belongsTo(Order::class, 'order_id', 'id');
+    //Relasi Invers ke Transaksi Model
+    public function transaction() {
+        return $this->belongsTo(Transaction::class, 'transaction_id', 'id');
     }
 }

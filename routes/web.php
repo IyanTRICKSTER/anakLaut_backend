@@ -36,6 +36,7 @@ Route::group(['prefix' => 'admin'], function(){
     Route::post('/password/reset', [App\Http\Controllers\AuthAdmin\ResetPasswordController::class, 'reset'])->name('admin.password.update');
     Route::get('/register', [App\Http\Controllers\AuthAdmin\RegisterController::class, 'showRegistrationForm'])->name('admin.register');
     Route::post('/register', [App\Http\Controllers\AuthAdmin\RegisterController::class, 'register']);
+    Route::get('/get-dashboard-info', [\App\Http\Controllers\AdminController::class, 'getDashboardInfo'])->name('get.dashboard.info');
 
     // Product
     Route::get('/products', [App\Http\Controllers\ProductController::class, 'index']);
@@ -45,6 +46,15 @@ Route::group(['prefix' => 'admin'], function(){
     Route::patch('/products/update/{id}', [App\Http\Controllers\ProductController::class, 'update'])->name('product.update');
     Route::get('/products/detail/{id}', [App\Http\Controllers\ProductController::class, 'show'])->name('product.detail');
     Route::get('/products/destroy/{id}', [App\Http\Controllers\ProductController::class, 'destroy'])->name('product.destroy');
+
+    // Order
+    Route::get('/orders', [App\Http\Controllers\OrderController::class, 'index']);
+    
 });
 
-
+// Midtrans Gateway Test
+Route::get('/admin/transactions', [\App\Http\Controllers\TransactionController::class, 'index']);
+Route::get('/payment', [\App\Http\Controllers\TransactionController::class, 'checkout'])->name('payment');
+Route::post('/payment/token', [\App\Http\Controllers\TransactionController::class, 'token'])->name('payment.token');
+Route::post('/payment/finish', [\App\Http\Controllers\TransactionController::class, 'finish'])->name('payment.finish');
+Route::post('/payment/notification', [\App\Http\Controllers\TransactionController::class, 'notification']);

@@ -15,12 +15,11 @@ class CreatePaymentsTable extends Migration
     {
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('order_id');
-            $table->string('payment_no');
-            $table->string('payment_type');
-            $table->string('rek_num');
-            $table->string('ewallet_num');
-            $table->integer('amount');
+            $table->string('transaction_id');
+            $table->char('payment_type', 30);
+            $table->char('bank');
+            $table->bigInteger('va_number');
+            $table->bigInteger('gross_amount');
             $table->softDeletes();
             $table->timestamps();
         });

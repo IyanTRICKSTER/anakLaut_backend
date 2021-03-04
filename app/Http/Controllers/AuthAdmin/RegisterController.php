@@ -53,11 +53,8 @@ class RegisterController extends Controller
             'password' => 'required|string|min:8|confirmed',
         ]);
 
-        $user = $this->create([
-            'name' => $data['name'],
-            'email' => $data['email'],
-            'password' => Hash::make($data['password']),
-        ]);
+        $user = $this->create($data);
+        
         event(new Registered($user));
 
         Auth::guard('admin')->login($user);

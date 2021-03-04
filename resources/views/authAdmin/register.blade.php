@@ -16,7 +16,7 @@
                         <div class="form-group row">
                             <div class="col-sm-12 mb-3 mb-sm-0">
                                 <input type="text" id="name"  class="form-control form-control-user @error('name') is-invalid @enderror" name="name"
-                                    placeholder="First Name" value="{{ old('name') }}">
+                                    placeholder="Username" value="{{ old('name') }}">
                             </div>
                             {{-- <div class="col-sm-6">
                                 <input type="text" class="form-control form-control-user" id="exampleLastName"
@@ -56,17 +56,17 @@
                             </div>
                         </div>
                         <button type="submit" class="btn btn-primary btn-user btn-block">
-                            Register Account
+                            Buat Akun
                         </button>
                         <hr>
-                        <a href="index.html" class="btn btn-google btn-user btn-block">
+                        {{-- <a href="index.html" class="btn btn-google btn-user btn-block">
                             <i class="fab fa-google fa-fw"></i> Register with Google
                         </a>
                         <a href="index.html" class="btn btn-facebook btn-user btn-block">
                             <i class="fab fa-facebook-f fa-fw"></i> Register with Facebook
-                        </a>
+                        </a> --}}
                     </form>
-                    <hr>
+                    {{-- <hr> --}}
                     <div class="text-center">
                         <a class="small" href="{{ route('admin.login') }}">Sudah memiliki akun? Login!</a>
                     </div>

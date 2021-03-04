@@ -21,8 +21,10 @@
                             <div class="row no-gutters align-items-center">
                                 <div class="col mr-2">
                                     <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                        Pendapatan (Bulan)</div>
-                                    <div class=" mb-0 font-weight-bold text-gray-800">Rp. 20.000.000</div>
+                                        Total Pendapatan</div>
+                                    <div class="mb-0 font-weight-bold text-gray-800">
+                                        <div class="income">0</div>
+                                    </div>
                                 </div>
                                 {{-- <div class="col-auto">
                                             <i class="fas fa-calendar fa-2x text-gray-300"></i>
@@ -39,8 +41,8 @@
                             <div class="row no-gutters align-items-center">
                                 <div class="col mr-2">
                                     <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                                        Pesanan Belum Diproses</div>
-                                    <div class="h5 mb-0 font-weight-bold text-gray-800">50</div>
+                                        Pesanan Belum Dibayar</div>
+                                    <div class="transaction_pending h5 mb-0 font-weight-bold text-gray-800">0</div>
                                 </div>
                                 <div class="col-auto">
                                     <i class="fas fa-dollar-sign fa-2x text-gray-300"></i>
@@ -61,7 +63,7 @@
                                     </div>
                                     <div class="row no-gutters align-items-center">
                                         <div class="col-auto">
-                                            <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">50</div>
+                                            <div class="transaction_success h5 mb-0 mr-3 font-weight-bold text-gray-800">0</div>
                                         </div>
 
                                     </div>
@@ -83,7 +85,7 @@
                                     <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">
                                         Pesanan Gagal
                                     </div>
-                                    <div class="h5 mb-0 font-weight-bold text-gray-800">18</div>
+                                    <div class="transaction_failed h5 mb-0 font-weight-bold text-gray-800">0</div>
                                 </div>
                                 <div class="col-auto mt-3">
                                     <i class="fas fa-times fa-2x text-gray-300"></i>
@@ -106,9 +108,9 @@
                 <div class="collapse show" id="collapseCardExample">
                     <div class="card-body">
                         @if (!empty(Auth::guard('admin')->user()->shop_description))
-                            {{ Auth::guard('admin')->user()->shop_description }}
+                        {{ Auth::guard('admin')->user()->shop_description }}
                         @else
-                            Tokomu belum ada deskripsi nih...
+                        Tokomu belum ada deskripsi nih...
                         @endif
                     </div>
                 </div>
@@ -226,30 +228,6 @@
                                     <td>2011/04/25</td>
                                     <td>$320,800</td>
                                 </tr>
-                                <tr>
-                                    <td>Garrett Winters</td>
-                                    <td>Accountant</td>
-                                    <td>Tokyo</td>
-                                    <td>63</td>
-                                    <td>2011/07/25</td>
-                                    <td>$170,750</td>
-                                </tr>
-                                <tr>
-                                    <td>Ashton Cox</td>
-                                    <td>Junior Technical Author</td>
-                                    <td>San Francisco</td>
-                                    <td>66</td>
-                                    <td>2009/01/12</td>
-                                    <td>$86,000</td>
-                                </tr>
-                                <tr>
-                                    <td>Cedric Kelly</td>
-                                    <td>Senior Javascript Developer</td>
-                                    <td>Edinburgh</td>
-                                    <td>22</td>
-                                    <td>2012/03/29</td>
-                                    <td>$433,060</td>
-                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -259,3 +237,47 @@
     </div>
 </div>
 @endsection
+
+@push('after-script')
+<script>
+    function getDashboardInfo() {
+        $.ajax({
+            url: "{{ route('get.dashboard.info') }}",
+            type: "GET",
+            async: false,
+            success: function (result) {
+
+                console.log(result.transactions)
+                
+                transactionInfo(result.transactions)
+                $(".income").text("Rp. " + result.income)
+                setTimeout(() => getDashboardInfo(), 5000)
+            },
+        })
+    }
+    getDashboardInfo();
+
+    //Hitung jumlah transaksi
+    function transactionInfo(params) {
+        var transactionSuccess = 0;
+        var transactionPending = 0;
+        var transactionFailed = 0;
+
+        params.forEach(transaction => {
+            if (transaction.status_code == 200) {
+                transactionSuccess++
+            } else if (transaction.status_code == 201) {
+                transactionPending++
+            } else if (transaction.status_code == 407) {
+                transactionFailed++
+            } 
+        });
+
+        $(".transaction_success").text(transactionSuccess)
+        $(".transaction_pending").text(transactionPending)
+        $(".transaction_failed").text(transactionFailed)
+
+    }
+    
+</script>
+@endpush

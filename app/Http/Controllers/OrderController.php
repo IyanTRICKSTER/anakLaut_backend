@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -13,12 +14,18 @@ class OrderController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
+    public function __construct()
+    {   
+        $this->middleware('auth:admin');
+    }
+
     public function index()
     {
         $owner_id = Auth::guard('admin')->user()->id;
-        $orders = Order::with(['order_details','shipment','payment'])->where('order_from', $owner_id)->get();
-
-        return view('pages.admin.orders.index', compact('orders'));
+        // $orders = Order::with(['shipment','payment','order_details'])->where('order_from', $owner_id)->get();
+        
+        return view('pages.admin.orders.index');
     }
 
     /**
@@ -26,8 +33,8 @@ class OrderController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
-    {
+    public function create(Request $request)
+    {   
         //
     }
 
@@ -39,7 +46,7 @@ class OrderController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        
     }
 
     /**

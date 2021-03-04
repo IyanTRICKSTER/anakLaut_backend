@@ -19,6 +19,8 @@ class ProductController extends Controller
      * @return \Illuminate\Http\Response
      */
 
+    protected $productTypes = array('ikan','kepiting','cumi','kerang');
+
     protected $owner_id = null;
 
     public function __construct()
@@ -43,7 +45,7 @@ class ProductController extends Controller
      */
     public function create()
     {
-        $productTypes = array('ikan','kepiting','cumi','kerang');
+        $productTypes = $this->productTypes;
         return view('pages.admin.products.create', compact('productTypes'));
     }
 
@@ -108,7 +110,7 @@ class ProductController extends Controller
     public function edit($id)
     {
         $product = Product::findOrFail(Crypt::decrypt($id));
-        $productTypes = array('ikan','kepiting','cumi','kerang');
+        $productTypes = $this->productTypes;
         return view('pages.admin.products.edit', compact(['product','productTypes']));
     }
 
@@ -121,7 +123,8 @@ class ProductController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $validated = $this->validate($request, [
+        // Validating new Product
+        $newProduct = $this->validate($request, [
             'name' => ['required','max:100'],
             'type' => ['required','max:50'],
             'weight' => ['required','max:100','min:1'],
@@ -133,7 +136,24 @@ class ProductController extends Controller
             'photo' =>  ['required', 'image']
         ]);
 
-        dd($validated);
+        $newProduct['slug'] = Str::slug($request->name);
+
+        $owner_id = Auth::guard('admin')->user()->id;
+        $newProduct['owned_by'] = $owner_id;
+
+        // Update Product
+        $updatedProduct = Product::findOrFail($id);
+        $updatedProduct->update($newProduct);  
+
+        // Update Image Product
+        $newProductImage['product_id'] = $id;
+        $newProductImage['image'] = $request->file('photo')->store('assets/products', 'public');
+        $newProductImage['is_default'] = 1;
+
+        $newImage = ProductGallery::where('product_id', $id);
+        $newImage->update($newProductImage);
+        
+        return redirect('/admin/products');
     }
 
     /**

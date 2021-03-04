@@ -12,11 +12,10 @@ class Order extends Model
     use SoftDeletes;
 
     protected $fillable = [
+        'transaction_id',
+        'order_from',
+        'customer_id',
         'uuid',
-        'name',
-        'email',
-        'phone',
-        'address',
         'status'
     ];
 
@@ -29,13 +28,7 @@ class Order extends Model
         return $this->hasMany(OrderDetail::class, 'order_id');
     }
 
-    // Relasi ke Model Shipment
-    public function shipment() {
-        return $this->hasOne(Shipment::class, 'order_id', 'id');
-    }
-
-    // Relasi ke Model Payment
-    public function payment() {
-        return $this->hasOne(Payment::class, 'order_id', 'id');
+    public function transaction() {
+        return $this->belongsTo(Transaction::class, 'transaction_id', 'id');
     }
 }

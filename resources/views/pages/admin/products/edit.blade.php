@@ -12,7 +12,8 @@
                     </div>
                     <div class="col-2">
                         <div class="">
-                            <a style="margin-left: 70px" class="btn btn-primary" href="{{ url('/admin/products') }}"> < back </a>
+                            <a class="btn btn-primary float-right" href="{{ url('/admin/products') }}">
+                                < back </a>
                         </div>
                     </div>
                 </div>
@@ -21,39 +22,47 @@
                 <form method="POST" action="{{ route('product.update', $product->id) }}" enctype="multipart/form-data">
                     @csrf
                     @method('PATCH')
-                    <div class="form-group">
-                        <label for="formGroupExampleInput">Nama Produk</label>
-                        <input value="{{ old('name') ? old('name') : $product->name }}" type="text"
-                            class="@error('name') is-invalid @enderror form-control form-control-user" id="name"
-                            name="name" placeholder="ikan tuna">
-                        @error('name')
-                        <div class="invalid-feedback">
-                            Tentukan nama produk!
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="form-group">
+                                <label for="formGroupExampleInput">Nama Produk</label>
+                                <input value="{{ old('name') ? old('name') : $product->name }}" type="text"
+                                    class="@error('name') is-invalid @enderror form-control form-control-user" id="name"
+                                    name="name" placeholder="ikan tuna">
+                                @error('name')
+                                <div class="invalid-feedback">
+                                    Tentukan nama produk!
+                                </div>
+                                @enderror
+                            </div>
+                            <div class="form-group">
+                                <label for="formGroupExampleInput2">Tipe Produk</label>
+                                <select id="type" name="type"
+                                    class="@error('type') is-invalid @enderror custom-select custom-select-md mb-3">
+                                    @foreach ($productTypes as $productType)
+                                    <option value="{{ $productType}}"
+                                        {{ $productType == $product->type ? 'selected' : '' }}>{{ $productType }}
+                                    </option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="formGroupExampleInput2">Berat (gram)</label>
+                                <input id="weight" name="weight" type="number"
+                                    class="@error('weight') is-invalid @enderror form-control"
+                                    value="{{ old('weight') ?  old('weight') :  $product->weight }}" placeholder="1000">
+                                @error('weight')
+                                <div class="invalid-feedback">
+                                    Tentukan berat barang!
+                                </div>
+                                @enderror
+                            </div>
                         </div>
-                        @enderror
+                        <div class="col-6 d-flex justify-content-center">
+                            <img class="rounded" src="{{ $product->product_galleries[0]->image }}" style="height: 94%; width: 85%">
+                        </div>
                     </div>
 
-
-                    <div class="form-group">
-                        <label for="formGroupExampleInput2">Tipe Produk</label>
-                        <select id="type" name="type"
-                            class="@error('type') is-invalid @enderror custom-select custom-select-md mb-3">
-                            @foreach ($productTypes as $productType)
-                            <option value="{{ $productType}}" {{ $productType == $product->type ? 'selected' : '' }}>{{ $productType }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="formGroupExampleInput2">Berat (gram)</label>
-                        <input id="weight" name="weight" type="number"
-                            class="@error('weight') is-invalid @enderror form-control"
-                            value="{{ old('weight') ?  old('weight') :  $product->weight }}" placeholder="1000">
-                        @error('weight')
-                        <div class="invalid-feedback">
-                            Tentukan berat barang!
-                        </div>
-                        @enderror
-                    </div>
                     <div class="form-group">
                         <label for="formGroupExampleInput2">Deskripsi Produk</label>
                         <input value="{{ old('description') ? old('description') : $product->description }}"
@@ -110,8 +119,8 @@
                     </div>
                     <div class="form-group">
                         <label for="photo">Gambar Produk</label>
-                        <input value="{{ old('photo') ?  old('photo') : $product->product_galleries[0]->image }}" type="file" name="photo"
-                            accept="image/*" class="@error('photo') is-invalid @enderror form-control-file">
+                        <input type="file" name="photo" accept="image/*"
+                            class="@error('photo') is-invalid @enderror form-control-file">
                         @error('photo')
                         <div class="invalid-feedback">
                             Pilih foto untuk barangmu!

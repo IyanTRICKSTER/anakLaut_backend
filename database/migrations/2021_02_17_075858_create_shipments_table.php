@@ -15,11 +15,15 @@ class CreateShipmentsTable extends Migration
     {
         Schema::create('shipments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('order_id');
-            $table->longText('shipment_address');
-            $table->string('shipment_date')->nullable();
-            $table->string('note');
-            $table->string('shipment_contact');
+            $table->string('transaction_id');
+            $table->string('first_name');
+            $table->string('last_name')->nullable();
+            $table->text('address');
+            $table->char('city', 40);
+            $table->mediumInteger('postal_code')->nullable();
+            $table->string('phone');
+            $table->char('country_code', 5)->nullable();
+            $table->softDeletes();
             $table->timestamps();
         });
     }
