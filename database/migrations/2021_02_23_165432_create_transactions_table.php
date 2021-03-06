@@ -15,6 +15,7 @@ class CreateTransactionsTable extends Migration
     {
         Schema::create('transactions', function (Blueprint $table) {
             $table->string('id')->primary();
+            $table->string('order_id');
             $table->smallInteger('status_code');
             $table->string('status_message');
             $table->string('transaction_time');

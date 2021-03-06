@@ -12,7 +12,7 @@ class Order extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'transaction_id',
+        'id',
         'order_from',
         'customer_id',
         'uuid',
@@ -29,6 +29,10 @@ class Order extends Model
     }
 
     public function transaction() {
-        return $this->belongsTo(Transaction::class, 'transaction_id', 'id');
+        return $this->hasOne(Transaction::class, 'order_id');
+    }
+
+    public function shipment() {
+        return $this->hasOne(Shipment::class, 'order_id');
     }
 }

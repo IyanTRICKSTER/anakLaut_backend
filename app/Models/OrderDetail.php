@@ -13,7 +13,8 @@ class OrderDetail extends Model
 
     protected $fillable = [
         'order_id',
-        'product_id'
+        'product_id',
+        'order_quantity'
     ];
 
     // Relasi Invers ke Model Order

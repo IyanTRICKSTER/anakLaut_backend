@@ -63,7 +63,9 @@
                                     </div>
                                     <div class="row no-gutters align-items-center">
                                         <div class="col-auto">
-                                            <div class="transaction_success h5 mb-0 mr-3 font-weight-bold text-gray-800">0</div>
+                                            <div
+                                                class="transaction_success h5 mb-0 mr-3 font-weight-bold text-gray-800">
+                                                0</div>
                                         </div>
 
                                     </div>
@@ -98,7 +100,7 @@
             <!-- Content Row -->
         </div>
         <div class="col-lg-3">
-            <div class="card shadow mb-4">
+            <div class="card shadow mb-4" style="height: 88%">
                 <!-- Card Header - Accordion -->
                 <a href="#collapseCardExample" class="d-block card-header py-3" data-toggle="collapse" role="button"
                     aria-expanded="true" aria-controls="collapseCardExample">
@@ -201,33 +203,38 @@
                         <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                             <thead>
                                 <tr>
-                                    <th>Name</th>
-                                    <th>Position</th>
-                                    <th>Office</th>
-                                    <th>Age</th>
-                                    <th>Start date</th>
-                                    <th>Salary</th>
+                                    <th>#</th>
+                                    <th>Barang</th>
+                                    <th>Harga</th>
+                                    <th>Pembeli</th>
+                                    <th>Email</th>
+                                    <th>Status</th>
                                 </tr>
                             </thead>
                             <tfoot>
                                 <tr>
-                                    <th>Name</th>
-                                    <th>Position</th>
-                                    <th>Office</th>
-                                    <th>Age</th>
-                                    <th>Start date</th>
-                                    <th>Salary</th>
+                                    <th>#</th>
+                                    <th>Barang</th>
+                                    <th>Harga</th>
+                                    <th>Pembeli</th>
+                                    <th>Email</th>
+                                    <th>Status</th>
                                 </tr>
                             </tfoot>
                             <tbody>
-                                <tr>
-                                    <td>Tiger Nixon</td>
-                                    <td>System Architect</td>
-                                    <td>Edinburgh</td>
-                                    <td>61</td>
-                                    <td>2011/04/25</td>
-                                    <td>$320,800</td>
-                                </tr>
+
+                                <div>
+
+                                    <tr>
+                                        <td>1</td>
+                                        <td>System Architect</td>
+                                        <td>Edinburgh</td>
+                                        <td>61</td>
+                                        <td>2011/04/25</td>
+                                        <td>$320,800</td>
+                                    </tr>
+                                    
+                                </div>
                             </tbody>
                         </table>
                     </div>
@@ -247,8 +254,8 @@
             async: false,
             success: function (result) {
 
-                console.log(result.transactions)
-                
+                console.log(result)
+
                 transactionInfo(result.transactions)
                 $(".income").text("Rp. " + result.income)
                 setTimeout(() => getDashboardInfo(), 5000)
@@ -270,7 +277,7 @@
                 transactionPending++
             } else if (transaction.status_code == 407) {
                 transactionFailed++
-            } 
+            }
         });
 
         $(".transaction_success").text(transactionSuccess)
@@ -278,6 +285,6 @@
         $(".transaction_failed").text(transactionFailed)
 
     }
-    
+
 </script>
 @endpush

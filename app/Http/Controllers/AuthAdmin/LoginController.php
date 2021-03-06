@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\AuthAdmin;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Contracts\Support\MessageBag;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -45,7 +46,7 @@ class LoginController extends Controller
         // Kirim pesan eror jika false
         if ($validator->fails()) {
             return redirect()->back()
-                ->withErrors($validator)
+                ->withErrors(array('invalid' => 'Fields are empty!'))
                 ->withInput();
         }
 

@@ -12,7 +12,7 @@ class Shipment extends Model
     use SoftDeletes;
 
     protected $fillable = [
-        'transaction_id',
+        'order_id',
         'first_name',
         'last_name',
         'address',
@@ -24,6 +24,6 @@ class Shipment extends Model
 
     //Relasi Invers ke Transaksi Model
     public function transaction() {
-        return $this->belongsTo(Transaction::class, 'transaction_id', 'id');
+        return $this->belongsTo(Transaction::class, 'order_id', 'id');
     }
 }

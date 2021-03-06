@@ -2,13 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Admin;
 use App\Models\Order;
-use App\Models\Payment;
-use Illuminate\Http\Request;
+use App\Models\OrderDetail;
 use App\Models\Product;
 use App\Models\Shipment;
 use App\Models\Transaction;
+
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class TransactionController extends Controller
 {
@@ -23,17 +26,17 @@ class TransactionController extends Controller
         $ownerId = Auth::guard('admin')->user()->id;
         $data = Order::with(['transaction', 'order_details'])->where('order_from', $ownerId)->get();
 
-        if(count($data) > 0) {
+        if (count($data) > 0) {
 
             foreach ($data as $key => $value) {
                 $transactions[] = $data[$key]->transaction;
                 $order_details[] = $data[$key]->order_details[0];
             }
-    
+
             foreach ($order_details as $key => $value) {
                 $products[] = Product::where('id', $order_details[$key]->product_id)->get();
             }
-    
+
             foreach ($products as $key => $value) {
                 $x[] = $products[$key][0];
             }
@@ -55,9 +58,49 @@ class TransactionController extends Controller
 
     public function token(Request $request)
     {
+    
+        $orders = $request->input('orders');
 
-        //GET PRODUCT INFO
-        $product = Product::findOrFail($request->input('product_id'));
+        foreach ($orders as $key => $value) {
+            //value order_from dijadikan array key untuk value dari order_data
+            $order_in[$value['order_from']][] = $value['order_data'];
+            try {
+                // GET PRODUCT FROM DATABASE BASED ON INPUT JSON
+                $product["items"][] = Product::findOrFail(intval($value['order_data']['product_id']));
+                // SET PRODUCT QUANTITY ORDERS
+                $product["quantity"][] = $value['order_data']['quantity'];
+                Log::info("Query produk berhasil"); error_log("Query produk berhasil");
+            } catch (\Throwable $th) {
+                // throw $th;
+            }
+        }
+        
+        //BARANG HASIL INPUT
+        Log::info("BARANG PESANAN MASUK");
+        Log::info($order_in);
+        
+        //GET KEYS OF ARRAY
+        Log::info("PESAN DARI ADMIN ID ...");
+        $orderFrom = array_keys($order_in);
+        Log::info($orderFrom);
+
+        //GET ADMIN BY IT'S ID
+        $admin = Admin::findOrFail($orderFrom[0]);
+
+        // MENYIAPKAN ARRAY ORDER DETAIL UNTUK KEMUDIAN DI PROSES OLEH MIDTRANS
+        error_log("Menyiapkan data order");
+        foreach ($product["items"] as $key => $value) {
+            $item_order_detials[] = array(
+                'id' => $value->id,
+                'price' => $value->price,
+                'quantity' => $product['quantity'][$key],
+                'name' => $value->name
+            );
+        }
+
+        Log::info("ITEM ORDER DETAILS");
+        Log::info($item_order_detials);
+
 
         error_log('masuk ke snap token dri ajax');
 
@@ -65,13 +108,31 @@ class TransactionController extends Controller
         $params = array(
             'transaction_details' => array(
                 'order_id' => uniqid("IYN"),
-                'gross_amount' => 0,
+                'gross_amount' => 1,
             ),
 
             "enabled_payments" => array(
                 "bca_va",
                 "gopay",
                 "indomaret"
+            ),
+
+            "bca_va" => array(
+                "va_number" => strval($admin->rek_num),
+                "free_text" => [
+                    "inquiry" => [
+                        [
+                            "en" => "text in English",
+                            "id" => "text in Bahasa Indonesia"
+                        ]
+                    ],
+                    "payment" => [
+                        [
+                            "en" => "text in English",
+                            "id" => "text in Bahasa Indonesia"
+                        ]
+                    ]
+                ]
             ),
 
             'customer_details' => array( //DATA MASIH STATIS
@@ -108,22 +169,16 @@ class TransactionController extends Controller
 
             'expiry' => array(
                 'start_time' => date("Y-m-d H:i:s O", $time),
-                'unit'       => 'hour',
-                'duration'   => 24
+                'unit'       => 'minute',
+                'duration'   => 3
             ),
 
-            'item_details' => array(
-                array(
-                    'id'        => 'item2',
-                    'price'     => $product->price,
-                    'quantity'  => $request->input('quantity'),
-                    'name'      => $product->name
-                )
-            )
+            'item_details' => $item_order_detials
         );
 
         try { //Return snap token if success
             $snapToken = \Midtrans\Snap::getSnapToken($params);
+            error_log("Midtrans Snap Token Has Been Sent!");
             return $snapToken;
         } catch (\Throwable $err) {
             return $err;
@@ -132,13 +187,20 @@ class TransactionController extends Controller
 
     public function finish(Request $request)
     {
+        // dd($request);
+        $orders = $request->input('order_data');
+        $orders = json_decode($orders, true);
+        $orders = $orders['orders'];
+        if(!empty($orders) || $orders != null) {
+            error_log("Orders Found!");
+            Log::info("Orders Found!");
+        }
 
-        $order_data = $request->input('order_data');
-        $order_data = json_decode($order_data, true);
-
+        // TO ARRAY JSON result_data
         $result = $request->input('result_data');
         $result = ((array) json_decode($result));
-        // dd($result);
+
+        // TRY TO GET VIRTUAL NUMBER/Nomer Rek BANK
         try {
             $va_number = ((array) $result['va_numbers'][0]);
         } catch (\Throwable $th) {
@@ -148,48 +210,31 @@ class TransactionController extends Controller
             ];
         }
 
-        // Add New Transaction
-        $newTransaction = new Transaction;
-        $newTransaction->id = $result['transaction_id'];
-        $newTransaction->status_code = $result['status_code'];
-        $newTransaction->status_message = $result['status_message'];
-        $newTransaction->transaction_time = $result['transaction_time'];
-        $newTransaction->transaction_status = $result['transaction_status'];
-        $newTransaction->fraud_status = $result['fraud_status'];
-        $newTransaction->pdf_url = $result['pdf_url'];
-        $newTransaction->save();
+        //Create new Order
+        $newOrder = new Order;
+        $newOrder->id = $result['order_id'];
+        $newOrder->order_from = intval($orders[0]["order_from"]); //DATA STATIS
+        $newOrder->customer_id = intval($orders[0]["customer_id"]); //DATA STATIS
+        $newOrder->status = $result['transaction_status'];
+        
 
-        if ($newTransaction) {
+        if (true) {
 
-            //Add Payment
-            $payment_data = array(
-                'transaction_id' => $newTransaction->id,
-                'payment_type' => $result['payment_type'],
-                'va_number' => $va_number['va_number'],
-                'bank' => $va_number['bank'],
-                'gross_amount' => $result['gross_amount']
-            );
-            Payment::create($payment_data);
+            //Create New Order Details (expect an array)
+            foreach ($orders as $key => $value) {
+                $orderDetails =  OrderDetail::create([
+                    'product_id' => $value["order_data"]['product_id'],
+                    'order_quantity' => $value["order_data"]['quantity'],
+                    'order_id' => $result['order_id']
+                 ]);
+                 if($orderDetails) {
+                     error_log("Order details created successfully");
+                 }
+            }
 
-            //Add Order & Order Details
-            $orderData = array(
-                'transaction_id' => $newTransaction->id,
-                'order_from' => 2, // DATA MASIH STATiS
-                'customer_id' => 1, // DATA MASIH STATIS
-                'status' => $result['transaction_status'],
-            );
-            $order = Order::create($orderData);
-
-            $order_details_data = array(
-                'product_id' => $order_data['product_id'], // DATA MASIH STATIS
-                'quantity' => $order_data['quantity'],
-                'order_id' => $order->id
-            );
-            $order->order_details()->create($order_details_data);
-
-            //Add Shipment
-            $shipment_data = array( //DATA ARRAY MASIH STATIS
-                'transaction_id' => $newTransaction->id,
+            // Create New Shipment 
+            $shipment = Shipment::create([ //DATA PENGIRIMAN MASIH STATIS
+                'order_id' => $result['order_id'],
                 'first_name'    => "customer",
                 'last_name'     => "1",
                 'email'         => 'customer@example.com',
@@ -198,13 +243,38 @@ class TransactionController extends Controller
                 'city'          => "Jakarta",
                 'postal_code'   => "51162",
                 'country_code'  => 'IDN'
+            ]);
+            if($shipment) {
+                error_log("Shipment created successfully");
+            }
 
-            );
-            Shipment::create($shipment_data);
-        }
+            //Create New Transaction
+            $newTransaction = new Transaction;
+            $newTransaction->id = $result['transaction_id'];
+            $newTransaction->order_id = $result['order_id'];
+            $newTransaction->status_code = $result['status_code'];
+            $newTransaction->status_message = $result['status_message'];
+            $newTransaction->transaction_time = $result['transaction_time'];
+            $newTransaction->transaction_status = $result['transaction_status'];
+            $newTransaction->fraud_status = $result['fraud_status'];
+            $newTransaction->pdf_url = $result['pdf_url'];
+            $newTransaction->save();
+
+            if ($newTransaction) {
+                error_log("Transaction created successfully");
+                // Create new Payment
+                $newTransaction->payment()->create([
+                    'transaction_id' => $newTransaction->id,
+                    'payment_type' => $result['payment_type'],
+                    'va_number' => $va_number['va_number'],
+                    'bank' => $va_number['bank'],
+                    'gross_amount' => $result['gross_amount']
+                ]);
+            }
+        } $newOrder->save();
 
 
-        return "berhasil";
+        return "order berhasil";
     }
 
     public function notification(Request $request)
@@ -216,6 +286,8 @@ class TransactionController extends Controller
         $transaction_id = $notif->transaction_id;
         $status_code = $notif->status_code;
         $fraud = $notif->fraud_status;
+
+        error_log("order $notif->order_id");
 
         // error_log("Order ID = $notif->order_id: " . "transaction status = $transaction, fraud staus = $fraud" . 
         // " Trans ID = $transaction_id" . " Status code = $status_code" . " Status Message = $notif->status_message");

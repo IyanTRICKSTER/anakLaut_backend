@@ -15,6 +15,7 @@ class Transaction extends Model
 
     protected $fillable = [
         'id',
+        'order_id',
         'status_code',
         'status_message',
         'transaction_time',
@@ -25,11 +26,7 @@ class Transaction extends Model
 
 
     public function order() {
-        return $this->hasMany(Order::class, 'transaction_id');
-    }
-
-    public function shipment() {
-        return $this->hasMany(Shipment::class, 'transaction_id');
+        return $this->belongsTo(Order::class, 'order_id', 'id');
     }
 
     public function payment() {

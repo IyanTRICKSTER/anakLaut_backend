@@ -4,7 +4,7 @@
 <div class="container-fluid">
     <div class="mt-4 ml-4 mr-4 mb-4">
 
-        <div class="card">
+        <div class="card shadow">
             <div class="card-header font-weight-bold text-primary">
                 <div class="row">
                     <div class="col-10">
@@ -59,7 +59,7 @@
                             </div>
                         </div>
                         <div class="col-6 d-flex justify-content-center">
-                            <img class="rounded" src="{{ $product->product_galleries[0]->image }}" style="height: 94%; width: 85%">
+                            <img class="rounded shadow" src="{{ $product->product_galleries[0]->image }}" style="height: 94%; width: 84%">
                         </div>
                     </div>
 
@@ -118,7 +118,7 @@
                         @enderror
                     </div>
                     <div class="form-group">
-                        <label for="photo">Gambar Produk</label>
+                        <label for="photo">Gambar baru.</label>
                         <input type="file" name="photo" accept="image/*"
                             class="@error('photo') is-invalid @enderror form-control-file">
                         @error('photo')
