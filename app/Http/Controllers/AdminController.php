@@ -89,7 +89,7 @@ class AdminController extends Controller
 
             return response()->json([
                 "status" => 200,
-                "income" => $income,
+                "income" => $income,//
                 "transactions"  => $transactions,
                 "orders_id" => $products["order_id"],
                 "products" => $products["product"],

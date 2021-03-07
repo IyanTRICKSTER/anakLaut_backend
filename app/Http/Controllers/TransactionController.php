@@ -18,6 +18,7 @@ class TransactionController extends Controller
     public function __construct()
     {
         //initialize midtrans payment gateway
+        $this->middleware('auth:admin')->only('index');
         $this->_midtrans_init();
     }
 
