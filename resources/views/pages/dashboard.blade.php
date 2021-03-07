@@ -205,36 +205,33 @@
                                 <tr>
                                     <th>#</th>
                                     <th>Barang</th>
-                                    <th>Harga</th>
+                                    <th>Order ID</th>
+                                    <th>Harga/Kg</th>
+                                    <th>Total beli(Kg)</th>
                                     <th>Pembeli</th>
-                                    <th>Email</th>
-                                    <th>Status</th>
                                 </tr>
                             </thead>
                             <tfoot>
                                 <tr>
                                     <th>#</th>
                                     <th>Barang</th>
-                                    <th>Harga</th>
+                                    <th>Order ID</th>
+                                    <th>Harga/Kg</th>
+                                    <th>Total beli(Kg)</th>
                                     <th>Pembeli</th>
-                                    <th>Email</th>
-                                    <th>Status</th>
                                 </tr>
                             </tfoot>
-                            <tbody>
+                            <tbody class="product-success">
 
-                                <div>
+                                <tr>
+                                    <td>1</td>
+                                    <td>System Architect</td>
+                                    <td>Edinburgh</td>
+                                    <td>61</td>
+                                    <td>2011/04/25</td>
+                                    <td>$320,800</td>
+                                </tr>
 
-                                    <tr>
-                                        <td>1</td>
-                                        <td>System Architect</td>
-                                        <td>Edinburgh</td>
-                                        <td>61</td>
-                                        <td>2011/04/25</td>
-                                        <td>$320,800</td>
-                                    </tr>
-                                    
-                                </div>
                             </tbody>
                         </table>
                     </div>
@@ -254,11 +251,13 @@
             async: false,
             success: function (result) {
 
-                console.log(result)
+                // console.log(result.transactions)
 
                 transactionInfo(result.transactions)
+                showProductSuccess(result.products, result.orders_id, result.orders_quantity)
+
                 $(".income").text("Rp. " + result.income)
-                setTimeout(() => getDashboardInfo(), 5000)
+                setTimeout(() => getDashboardInfo(), 10000)
             },
         })
     }
@@ -284,6 +283,41 @@
         $(".transaction_pending").text(transactionPending)
         $(".transaction_failed").text(transactionFailed)
 
+    }
+
+    function showProductSuccess(products, orderId, orderQuantity) {
+
+
+        $(".product-success").html('');
+        products.forEach((element, index) => {
+            $(".product-success").append(`
+                <tr>
+                    <td>#</td>
+                    <td>${element.name}</td>
+                    <td>${orderId[index]}</td>
+                    <td>Rp. ${rupiah(element.price)}</td>
+                    <td>${orderQuantity[index]}</td>
+                    <td>iyan@wkwk.co.id</td>
+                </tr>`)
+        });
+    }
+
+    function rupiah(number) {
+        var bilangan = number;
+
+        var number_string = bilangan.toString(),
+            split = number_string.split(','),
+            sisa = split[0].length % 3,
+            rupiah = split[0].substr(0, sisa),
+            ribuan = split[0].substr(sisa).match(/\d{1,3}/gi);
+
+        if (ribuan) {
+            separator = sisa ? '.' : '';
+            rupiah += separator + ribuan.join('.');
+        }
+        rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
+
+        return rupiah;
     }
 
 </script>

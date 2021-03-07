@@ -182,6 +182,7 @@ class TransactionController extends Controller
             return $snapToken;
         } catch (\Throwable $err) {
             return $err;
+            Log::info($err);
         }
     }
 
@@ -192,7 +193,9 @@ class TransactionController extends Controller
         $orders = json_decode($orders, true);
         $orders = $orders['orders'];
         if(!empty($orders) || $orders != null) {
-            error_log("Orders Found!");
+            error_log("=================");
+            error_log("= Orders Found! =");
+            error_log("=================");
             Log::info("Orders Found!");
         }
 
@@ -221,16 +224,22 @@ class TransactionController extends Controller
         if (true) {
 
             //Create New Order Details (expect an array)
-            foreach ($orders as $key => $value) {
+            for($i=0; $i < count($orders); $i++) {
+
                 $orderDetails =  OrderDetail::create([
-                    'product_id' => $value["order_data"]['product_id'],
-                    'order_quantity' => $value["order_data"]['quantity'],
+                    'product_id' => $orders[$i]["order_data"]['product_id'],
+                    'order_quantity' => $orders[$i]["order_data"]['quantity'],
                     'order_id' => $result['order_id']
                  ]);
+        
+                //  dd($orderDetails);
+
                  if($orderDetails) {
                      error_log("Order details created successfully");
                  }
             }
+            // foreach ($orders as $key => $value) {
+            // }
 
             // Create New Shipment 
             $shipment = Shipment::create([ //DATA PENGIRIMAN MASIH STATIS
@@ -290,7 +299,7 @@ class TransactionController extends Controller
         error_log("order $notif->order_id");
 
         // error_log("Order ID = $notif->order_id: " . "transaction status = $transaction, fraud staus = $fraud" . 
-        // " Trans ID = $transaction_id" . " Status code = $status_code" . " Status Message = $notif->status_message");
+        // " Trans ID = $transaction_id" . " Status code = $status_code" . " Status Message = $notif->status_message")
 
         if ($transaction == 'settlement') {
             if ($fraud == 'challenge') {
@@ -300,6 +309,20 @@ class TransactionController extends Controller
                     'transaction_status' => $transaction,
                     'status_message' => 'Transaksi berhasil'
                 ]);
+                
+                // Get Product ID and then decrease the quantity of the Product
+                $orders = OrderDetail::with('product')->where("order_id", strval($notif->order_id))->get();
+                Log::info($orders);
+
+                try {
+                    foreach ($orders as $key => $value) {
+                        Product::where('id', $value->product_id)->decrement('stock', $value->order_quantity);
+                    }
+                } catch (\Throwable $th) {
+                    throw $th;
+                    Log::info('ERROR: decrementing failed');
+                }
+
             } else if ($fraud == 'accept') {
                 // TODO Set payment status in merchant's database to 'success'
                 Transaction::where('id', strval($transaction_id))->update([
@@ -307,7 +330,23 @@ class TransactionController extends Controller
                     'transaction_status' => $transaction,
                     'status_message' => 'Transaksi berhasil'
                 ]);
+
+                // Get Product ID and then decrease the quantity of the Product
+                $orders = OrderDetail::with('product')->where("order_id", strval($notif->order_id))->get();
+                Log::info($orders);
+
+                try {
+                    foreach ($orders as $key => $value) {
+                        Product::where('id', $value->product_id)->decrement('stock', $value->order_quantity);
+                    }
+                } catch (\Throwable $th) {
+                    throw $th;
+                    Log::info('ERROR: decrementing failed');
+                }
+
+
             }
+            
         } else if ($transaction == 'cancel') {
             if ($fraud == 'challenge') {
                 // TODO Set payment status in merchant's database to 'failure'

@@ -45,15 +45,7 @@
                 url: "{{ route('payment.token') }}",
                 type: 'POST',
                 data: {
-                    "orders": [{
-                            "order_from": 1,
-                            "customer_id": 1,
-                            "order_data": {
-                                "product_id": 1,
-                                "quantity": 5,
-                            }
-                        },
-                        {
+                    "orders": [{  //ORDER HARUS DARI MERCHANT YANG SAMA
                             "order_from": 1,
                             "customer_id": 1,
                             "order_data": {
@@ -61,8 +53,16 @@
                                 "quantity": 10,
                             }
                         },
+                        {
+                            "order_from": 1,
+                            "customer_id": 1,
+                            "order_data": {
+                                "product_id": 3,
+                                "quantity": 10,
+                            }
+                        },
                         // {
-                        //     "order_from": 1,
+                        //     "order_from": 2,
                         //     "order_data": {
                         //     "product_id": 4,
                         //     "quantity": 4,
@@ -89,15 +89,15 @@
                                     "order_from": 1,
                                     "customer_id": 1,
                                     "order_data": {
-                                        "product_id": 1,
-                                        "quantity": 5,
+                                        "product_id": 2,
+                                        "quantity": 10,
                                     }
                                 },
                                 {
                                     "order_from": 1,
                                     "customer_id": 1,
                                     "order_data": {
-                                        "product_id": 2,
+                                        "product_id": 3,
                                         "quantity": 10,
                                     }
                                 },
