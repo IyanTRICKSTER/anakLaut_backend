@@ -45,8 +45,31 @@
                 url: "{{ route('payment.token') }}",
                 type: 'POST',
                 data: {
-                  "product_id": product_id,
-                  "quantity": quantity
+                    "orders": [{  //ORDER HARUS DARI MERCHANT YANG SAMA
+                            "order_from": 1,
+                            "customer_id": 1,
+                            "order_data": {
+                                "product_id": 2,
+                                "quantity": 10,
+                            }
+                        },
+                        {
+                            "order_from": 1,
+                            "customer_id": 1,
+                            "order_data": {
+                                "product_id": 3,
+                                "quantity": 10,
+                            }
+                        },
+                        // {
+                        //     "order_from": 2,
+                        //     "order_data": {
+                        //     "product_id": 4,
+                        //     "quantity": 4,
+                        //     }
+                        // },  
+
+                    ]
                 },
                 cache: false,
                 success: function (data) {
@@ -60,12 +83,35 @@
                     function changeResult(type, data) {
                         $("#result-type").val(type);
                         $("#result-data").val(JSON.stringify(data));
-                        $("#order_data").val(JSON.stringify({ 
-                                "product_id": product_id,
-                                "quantity": quantity,    
-                            }
-                        ))
-                        
+                        $("#order_data").val(JSON.stringify({
+                            "orders": [
+                                {
+                                    "order_from": 1,
+                                    "customer_id": 1,
+                                    "order_data": {
+                                        "product_id": 2,
+                                        "quantity": 10,
+                                    }
+                                },
+                                {
+                                    "order_from": 1,
+                                    "customer_id": 1,
+                                    "order_data": {
+                                        "product_id": 3,
+                                        "quantity": 10,
+                                    }
+                                },
+                                // {
+                                //     "order_from": 1,
+                                //     "order_data": {
+                                //     "product_id": 4,
+                                //     "quantity": 4,
+                                //     }
+                                // },  
+
+                            ]
+                        }))
+
                         //resultType.innerHTML = type;
                         //resultData.innerHTML = JSON.stringify(data);
                     }

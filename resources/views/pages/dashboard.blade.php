@@ -63,7 +63,9 @@
                                     </div>
                                     <div class="row no-gutters align-items-center">
                                         <div class="col-auto">
-                                            <div class="transaction_success h5 mb-0 mr-3 font-weight-bold text-gray-800">0</div>
+                                            <div
+                                                class="transaction_success h5 mb-0 mr-3 font-weight-bold text-gray-800">
+                                                0</div>
                                         </div>
 
                                     </div>
@@ -98,7 +100,7 @@
             <!-- Content Row -->
         </div>
         <div class="col-lg-3">
-            <div class="card shadow mb-4">
+            <div class="card shadow mb-4" style="height: 88%">
                 <!-- Card Header - Accordion -->
                 <a href="#collapseCardExample" class="d-block card-header py-3" data-toggle="collapse" role="button"
                     aria-expanded="true" aria-controls="collapseCardExample">
@@ -201,33 +203,35 @@
                         <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                             <thead>
                                 <tr>
-                                    <th>Name</th>
-                                    <th>Position</th>
-                                    <th>Office</th>
-                                    <th>Age</th>
-                                    <th>Start date</th>
-                                    <th>Salary</th>
+                                    <th>#</th>
+                                    <th>Barang</th>
+                                    <th>Order ID</th>
+                                    <th>Harga/Kg</th>
+                                    <th>Total beli(Kg)</th>
+                                    <th>Pembeli</th>
                                 </tr>
                             </thead>
                             <tfoot>
                                 <tr>
-                                    <th>Name</th>
-                                    <th>Position</th>
-                                    <th>Office</th>
-                                    <th>Age</th>
-                                    <th>Start date</th>
-                                    <th>Salary</th>
+                                    <th>#</th>
+                                    <th>Barang</th>
+                                    <th>Order ID</th>
+                                    <th>Harga/Kg</th>
+                                    <th>Total beli(Kg)</th>
+                                    <th>Pembeli</th>
                                 </tr>
                             </tfoot>
-                            <tbody>
+                            <tbody class="product-success">
+
                                 <tr>
-                                    <td>Tiger Nixon</td>
+                                    <td>1</td>
                                     <td>System Architect</td>
                                     <td>Edinburgh</td>
                                     <td>61</td>
                                     <td>2011/04/25</td>
                                     <td>$320,800</td>
                                 </tr>
+
                             </tbody>
                         </table>
                     </div>
@@ -247,11 +251,13 @@
             async: false,
             success: function (result) {
 
-                console.log(result.transactions)
-                
+                // console.log(result.transactions)
+
                 transactionInfo(result.transactions)
+                showProductSuccess(result.products, result.orders_id, result.orders_quantity)
+
                 $(".income").text("Rp. " + result.income)
-                setTimeout(() => getDashboardInfo(), 5000)
+                setTimeout(() => getDashboardInfo(), 10000)
             },
         })
     }
@@ -270,7 +276,7 @@
                 transactionPending++
             } else if (transaction.status_code == 407) {
                 transactionFailed++
-            } 
+            }
         });
 
         $(".transaction_success").text(transactionSuccess)
@@ -278,6 +284,41 @@
         $(".transaction_failed").text(transactionFailed)
 
     }
-    
+
+    function showProductSuccess(products, orderId, orderQuantity) {
+
+
+        $(".product-success").html('');
+        products.forEach((element, index) => {
+            $(".product-success").append(`
+                <tr>
+                    <td>#</td>
+                    <td>${element.name}</td>
+                    <td>${orderId[index]}</td>
+                    <td>Rp. ${rupiah(element.price)}</td>
+                    <td>${orderQuantity[index]}</td>
+                    <td>iyan@wkwk.co.id</td>
+                </tr>`)
+        });
+    }
+
+    function rupiah(number) {
+        var bilangan = number;
+
+        var number_string = bilangan.toString(),
+            split = number_string.split(','),
+            sisa = split[0].length % 3,
+            rupiah = split[0].substr(0, sisa),
+            ribuan = split[0].substr(sisa).match(/\d{1,3}/gi);
+
+        if (ribuan) {
+            separator = sisa ? '.' : '';
+            rupiah += separator + ribuan.join('.');
+        }
+        rupiah = split[1] != undefined ? rupiah + ',' + split[1] : rupiah;
+
+        return rupiah;
+    }
+
 </script>
 @endpush

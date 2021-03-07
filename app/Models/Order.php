@@ -11,8 +11,11 @@ class Order extends Model
     use HasFactory;
     use SoftDeletes;
 
+    public $incrementing = false;
+    protected $keyType = 'string';
+
     protected $fillable = [
-        'transaction_id',
+        'id',
         'order_from',
         'customer_id',
         'uuid',
@@ -29,6 +32,10 @@ class Order extends Model
     }
 
     public function transaction() {
-        return $this->belongsTo(Transaction::class, 'transaction_id', 'id');
+        return $this->hasOne(Transaction::class, 'order_id', 'id');
+    }
+
+    public function shipment() {
+        return $this->hasOne(Shipment::class, 'order_id');
     }
 }

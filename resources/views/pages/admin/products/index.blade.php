@@ -6,15 +6,30 @@
 @foreach ($products as $product)
 <ul>
     <li>
-        {{ $product->name }}
         @foreach ($product->product_galleries as $gallery)
-        <img src="{{ $gallery->image }}" alt="">
-        <a class="btn btn-primary" href="{{ route('product.edit', Crypt::encrypt($product->id)) }}"><i class="fas fa-pen"></i></a>
-       
-        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#exampleModalCenter" data-remote="{{ route('product.detail', $product->id) }}">
-            <i class="fas fa-eye"></i>
-        </button>
-        <a class="btn btn-danger" href="{{ route('product.destroy', $product->id) }}"><i class="fas fa-trash"></i></a>
+        <div class="card mb-3 ml-4 shadow" style="width: 90%;">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-3">
+                        <img class="rounded" style="height: 100%; width: 200px;" class="card-img-left" src="{{ $gallery->image }}"
+                            alt="Card image cap">
+                    </div>
+                    <div class="col-9">
+                        <h5 class="card-title">{{ $product->name }}</h5>
+                        <p class="card-text">Deskripsi: {{ $product->description }}</p>
+                        <a class="btn btn-primary" href="{{ route('product.edit', Crypt::encrypt($product->id)) }}"><i
+                                class="fas fa-pen"></i></a>
+
+                        <button type="button" class="btn btn-info" data-toggle="modal" data-target="#exampleModalCenter"
+                            data-remote="{{ route('product.detail', $product->id) }}">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <a class="btn btn-danger" href="{{ route('product.destroy', $product->id) }}"><i
+                                class="fas fa-trash"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
         @endforeach
     </li>
 </ul>
@@ -25,8 +40,8 @@
 <!-- Large modal -->
 
 <!-- Modal for Product Detail -->
-<div class="modal fade modalProductDetail" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle"
-    aria-hidden="true">
+<div class="modal fade modalProductDetail" id="exampleModalCenter" tabindex="-1" role="dialog"
+    aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -36,7 +51,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                
+
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -48,7 +63,7 @@
 @push('after-script')
 <script>
     $('.modalProductDetail').on('show.bs.modal', function (event) {
-        
+
         var button = $(event.relatedTarget) // Button that triggered the modal
         var link = button.data('remote') // Extract info from data-* attributes
 
@@ -62,7 +77,7 @@
                 modal.find('.modal-body').html(response)
             }
         })
-        
+
     })
 
 </script>
