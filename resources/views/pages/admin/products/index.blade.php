@@ -8,15 +8,15 @@
     <div class="container-fluid">
         <li style="margin-left: -20px;">
             @foreach ($product->product_galleries as $gallery)
-            <div class="card mb-3 shadow" style="width: 100%;">
+            <div class="card border-left-primary mb-3 shadow" style="width: 100%;">
                 <div class="card-body">
                     <div class="row">
                         <div class="col-lg-2 col-sm-5 col-md-3">
                             <div class="card">
                                 <div class="card-body px-0 py-0">
                                     {{-- <div class="col-2"> --}}
-                                        <img class="rounded shadow" style="height: 154px; width: 100%;" class=""
-                                            src="{{ $gallery->image }}" alt="Card image cap">
+                                    <img class="rounded shadow" style="height: 154px; width: 100%;" class=""
+                                        src="{{ $gallery->image }}" alt="Card image cap">
                                     {{-- </div> --}}
                                 </div>
                             </div>
@@ -25,19 +25,20 @@
                             <div class="card">
                                 <div class="card-body">
                                     {{-- <div class="col-10"> --}}
-                                        <h5 class="card-title">{{ $product->name }}</h5>
-                                        <p class="card-text">Deskripsi: {{ $product->description }}</p>
-                                        <a class="btn btn-primary"
-                                            href="{{ route('product.edit', Crypt::encrypt($product->id)) }}"><i
-                                                class="fas fa-pen"></i></a>
-    
-                                        <button type="button" class="btn btn-info" data-toggle="modal"
-                                            data-target="#exampleModalCenter"
-                                            data-remote="{{ route('product.detail', $product->id) }}">
-                                            <i class="fas fa-eye"></i>
-                                        </button>
-                                        <a class="btn btn-danger" href="{{ route('product.destroy', $product->id) }}"><i
-                                                class="fas fa-trash"></i></a>
+                                    <h5 class="card-title">{{ $product->name }}</h5>
+                                    <p class="card-text">Stok barang: {{ $product->stock }}</p>
+                                    <a class="btn btn-circle btn-primary"
+                                        href="{{ route('product.edit', Crypt::encrypt($product->id)) }}"><i
+                                            class="fas fa-pen"></i></a>
+
+                                    <button type="button" class="btn btn-circle btn-info" data-toggle="modal"
+                                        data-target="#exampleModalCenter"
+                                        data-remote="{{ route('product.detail', $product->id) }}">
+                                        <i class="fas fa-info-circle"></i>
+                                    </button>
+                                    <a class="btn btn-circle btn-danger"
+                                        href="{{ route('product.destroy', $product->id) }}"><i
+                                            class="fas fa-trash"></i></a>
                                     {{-- </div> --}}
                                 </div>
                             </div>

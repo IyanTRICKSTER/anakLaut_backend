@@ -39,7 +39,7 @@ class Product extends Model
 
     // Relasi ke Model Order Detail
     public function order_details() {
-        return $this->hasMany(OrderDetail::class, 'product_id');
+        return $this->belongsTo(OrderDetail::class, 'product_id', 'id');
     }
 
 }

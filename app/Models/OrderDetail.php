@@ -24,6 +24,6 @@ class OrderDetail extends Model
 
     // Relasi Invers ke Model Product
     public function product() {
-        return $this->belongsTo(Product::class, 'product_id', 'id');
+        return $this->hasMany(Product::class, 'product_id');
     }
 }

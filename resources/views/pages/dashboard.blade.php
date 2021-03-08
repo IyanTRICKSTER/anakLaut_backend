@@ -223,14 +223,14 @@
                             </tfoot>
                             <tbody class="product-success">
 
-                                <tr>
+                                {{-- <tr>
                                     <td>1</td>
                                     <td>System Architect</td>
                                     <td>Edinburgh</td>
                                     <td>61</td>
                                     <td>2011/04/25</td>
                                     <td>$320,800</td>
-                                </tr>
+                                </tr> --}}
 
                             </tbody>
                         </table>
@@ -254,7 +254,10 @@
                 // console.log(result.transactions)
 
                 transactionInfo(result.transactions)
-                showProductSuccess(result.products, result.orders_id, result.orders_quantity)
+
+                if(result.products.length > 0) {
+                    showProductSuccess(result.products, result.orders_id, result.orders_quantity)
+                }
 
                 $(".income").text("Rp. " + result.income)
                 setTimeout(() => getDashboardInfo(), 10000)

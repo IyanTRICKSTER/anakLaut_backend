@@ -13,50 +13,93 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
+
+interface Transactions {
+    public function findTransactionDetailsByAdminId($id);
+}
+
+// BUSINESS LOGIC
+class TransactionDetails implements Transactions {
+
+    public function findTransactionDetailsByAdminId($id)
+    {
+         // GET DATA ORDERS BY ADMIN ID
+         $data = Order::with(['transaction', 'order_details'])->where('order_from', $id)->get();
+
+         if (count($data) > 0) {
+ 
+             foreach ($data as $key => $value) {
+                 // AMBIL DATA DARI RELASI "transaction" dan "order_details"
+                 $transactions[] = $data[$key]->transaction; // relasi "transaction"
+                 $order_details[] = $data[$key]->order_details; // relasi "order_details"
+             }
+ 
+             foreach ($order_details as $key => $value) {
+                 foreach ($value as $key2 => $value2) {
+                     if($value2->product_id != null) {
+                         // Mengambil semua produk berdasarkan yg ada pada ORDER_DETAILS RECORD
+                         // Lalu setiap data ORDER_DETAILS dikelompokkan berdasarkan order_id yang
+                         // dimiliki ORDER_DETAILS
+                         $transactionDetails[strval($order_details[$key][$key2]->order_id)]["detail_products"][] = Product::with(['product_galleries'])->where('id', $value2->product_id)->get();
+                         $transactionDetails[strval($order_details[$key][$key2]->order_id)]["transaction_data"][] = $transactions[$key];
+                         $transactionDetails[strval($order_details[$key][$key2]->order_id)]["order_quantities"][] = $value2->order_quantity;
+                     }
+                 }
+             }
+             
+             return $transactionDetails;
+ 
+         } else {
+             return $transactionDetails = [];
+         }
+ 
+    }
+}
+
 class TransactionController extends Controller
 {
     public function __construct()
     {
-        //initialize midtrans payment gateway
         $this->middleware('auth:admin')->only('index');
-        $this->_midtrans_init();
+        $this->_midtrans_init(); //initialize midtrans payment gateway
     }
 
     public function index()
     {
         $ownerId = Auth::guard('admin')->user()->id;
-        $data = Order::with(['transaction', 'order_details'])->where('order_from', $ownerId)->get();
+       
+        //Mengambil Detail Transaksi
+        $transaction = new TransactionDetails;
+        $products = $transaction->findTransactionDetailsByAdminId($ownerId);
+        
+        //Mengambil key setiap array yg mana key-key tersebut digunakan untuk key index 
+        $order_keys = array_keys($products);
 
-        if (count($data) > 0) {
-
-            foreach ($data as $key => $value) {
-                $transactions[] = $data[$key]->transaction;
-                $order_details[] = $data[$key]->order_details[0];
-            }
-
-            foreach ($order_details as $key => $value) {
-                $products[] = Product::where('id', $order_details[$key]->product_id)->get();
-            }
-
-            foreach ($products as $key => $value) {
-                $x[] = $products[$key][0];
-            }
-            $products = $x;
-            unset($x);
-        } else {
-            $transactions = [];
-            $order_details = [];
-            $products = [];
-        }
-
-        return view('pages.admin.transactions.index', compact(['transactions', 'order_details', 'products']));
+        return view('pages.admin.transactions.index', compact(['products','order_keys']));
     }
 
+    // FUNGSI UNTUK UJI COBA
     public function checkout()
     {
         return view('pages.checkout');
     }
 
+    public function statusTransaction($orderId) {
+       $status =  \Midtrans\Transaction::status($orderId);
+       dd($status);
+    }
+
+    public function refundTransaction($orderId) {
+        $params = array(
+            'refund_key' => 'order1-ref1',
+            'amount' => 50000,
+            'reason' => 'Item out of stock'
+        );
+        $status =  \Midtrans\Transaction::refund($orderId, $params);
+        dd($status);
+    }
+
+    //API
     public function token(Request $request)
     {
     
@@ -170,8 +213,8 @@ class TransactionController extends Controller
 
             'expiry' => array(
                 'start_time' => date("Y-m-d H:i:s O", $time),
-                'unit'       => 'minute',
-                'duration'   => 3
+                'unit'       => 'day',
+                'duration'   => 1
             ),
 
             'item_details' => $item_order_detials

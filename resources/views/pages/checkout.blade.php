@@ -10,7 +10,7 @@
 </head>
 
 <body>
-    <form id="payment-form" method="post" action="{{ route('payment.finish') }}">
+    <form id="payment-form" method="post" action="{{ route('api.payment.finish') }}">
         @csrf
         <input type="hidden" name="result_type" id="result-type" value=""></div>
         <input type="hidden" name="result_data" id="result-data" value=""></div>
@@ -42,25 +42,25 @@
             });
 
             $.ajax({
-                url: "{{ route('payment.token') }}",
+                url: "{{ route('api.payment.token') }}",
                 type: 'POST',
                 data: {
                     "orders": [{  //ORDER HARUS DARI MERCHANT YANG SAMA
                             "order_from": 1,
                             "customer_id": 1,
                             "order_data": {
-                                "product_id": 2,
-                                "quantity": 10,
-                            }
-                        },
-                        {
-                            "order_from": 1,
-                            "customer_id": 1,
-                            "order_data": {
                                 "product_id": 3,
-                                "quantity": 10,
+                                "quantity": 1,
                             }
                         },
+                        // {
+                        //     "order_from": 1,
+                        //     "customer_id": 1,
+                        //     "order_data": {
+                        //         "product_id": 3,
+                        //         "quantity": 10,
+                        //     }
+                        // },
                         // {
                         //     "order_from": 2,
                         //     "order_data": {
@@ -75,7 +75,7 @@
                 success: function (data) {
 
                     //location = data;
-                    console.log('token = ' + data);
+                    console.log('token = ' + data["token"]);
 
                     var resultType = document.getElementById('result-type');
                     var resultData = document.getElementById('result-data');
@@ -89,18 +89,18 @@
                                     "order_from": 1,
                                     "customer_id": 1,
                                     "order_data": {
-                                        "product_id": 2,
-                                        "quantity": 10,
-                                    }
-                                },
-                                {
-                                    "order_from": 1,
-                                    "customer_id": 1,
-                                    "order_data": {
                                         "product_id": 3,
-                                        "quantity": 10,
+                                        "quantity": 1,
                                     }
                                 },
+                                // {
+                                //     "order_from": 1,
+                                //     "customer_id": 1,
+                                //     "order_data": {
+                                //         "product_id": 3,
+                                //         "quantity": 10,
+                                //     }
+                                // },
                                 // {
                                 //     "order_from": 1,
                                 //     "order_data": {
@@ -116,7 +116,7 @@
                         //resultData.innerHTML = JSON.stringify(data);
                     }
 
-                    snap.pay(data, {
+                    snap.pay(data["token"], {
 
                         onSuccess: function (result) {
                             changeResult('success', result);

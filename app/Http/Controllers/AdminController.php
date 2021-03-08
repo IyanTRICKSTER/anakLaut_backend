@@ -57,6 +57,7 @@ class AdminController extends Controller
             // END OF CALCULATE TOTAL AMOUNT OF MONEY
             
             // GET PRODUCT WHICH IS SUCCESS ORDERED
+
             try {
                 foreach ($success_ordered as $key => $value) {
                     foreach ($value as $key => $value2) {
@@ -67,6 +68,9 @@ class AdminController extends Controller
                 } 
             } catch (\Throwable $th) {
                 //throw $th;
+                $products["product"] = array();
+                $products["order_id"] = array();
+                $products["order_quantity"] = array();
                 error_log("ERROR: Querying product failed, Product does not exists");
                 Log::info("ERROR: Querying product failed, Product does not exists");
             }
